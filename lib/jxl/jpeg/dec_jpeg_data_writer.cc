@@ -347,10 +347,12 @@ bool EncodeDHT(const JPEGData& jpg, SerializationState* state) {
   size_t marker_len = 2;
   for (size_t i = state->dht_index; i < huffman_code.size(); ++i) {
     const JPEGHuffmanCode& huff = huffman_code[i];
-    marker_len += kJpegHuffmanMaxBitLength;
     for (size_t j = 0; j < huff.counts.size(); ++j) {
       marker_len += huff.counts[j];
     }
+    // special case: empty DHT marker
+    if (marker_len == 2) break;
+    marker_len += kJpegHuffmanMaxBitLength;
     if (huff.is_last) break;
   }
   state->output_queue.emplace_back(marker_len + 2);
@@ -368,6 +370,17 @@ bool EncodeDHT(const JPEGData& jpg, SerializationState* state) {
     const JPEGHuffmanCode& huff = huffman_code[huffman_code_index];
     size_t index = huff.slot_id;
     HuffmanCodeTable* huff_table;
+    size_t total_count = 0;
+    size_t max_length = 0;
+    for (size_t i = 0; i < huff.counts.size(); ++i) {
+      if (huff.counts[i] != 0) {
+        max_length = i;
+      }
+      total_count += huff.counts[i];
+    }
+    // Empty DHT marker
+    if (total_count == 0) break;
+
     if (index & 0x10) {
       index -= 0x10;
       huff_table = &state->ac_huff_table[index];
@@ -378,14 +391,6 @@ bool EncodeDHT(const JPEGData& jpg, SerializationState* state) {
     huff_table->InitDepths(127);
     if (!BuildHuffmanCodeTable(huff, huff_table)) {
       return false;
-    }
-    size_t total_count = 0;
-    size_t max_length = 0;
-    for (size_t i = 0; i < huff.counts.size(); ++i) {
-      if (huff.counts[i] != 0) {
-        max_length = i;
-      }
-      total_count += huff.counts[i];
     }
     --total_count;
     data[pos++] = huff.slot_id;
