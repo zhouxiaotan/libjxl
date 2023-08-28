@@ -7,7 +7,7 @@ Name: libjxl
 Description: Loads and saves JPEG XL files
 Version: @JPEGXL_LIBRARY_VERSION@
 Requires.private: @JPEGXL_LIBRARY_REQUIRES@
-Libs: -L${libdir} -ljxl
-Libs.private: -lm
+Libs: -L${libdir} -l@JPEGXL_LIBRARY_MAIN@
+Libs.private: -l@JPEGXL_MATH_LIBRARY@
 Cflags: -I${includedir}
 Cflags.private: -DJXL_STATIC_DEFINE
