@@ -259,6 +259,18 @@ install(TARGETS jxl
 set(JPEGXL_LIBRARY_REQUIRES
     "libhwy libbrotlienc libbrotlidec libjxl_cms")
 
+set(JPEGXL_MATH_LIBRARY "-lm")
+set(JPEGXL_LIBRARY_MAIN jxl)
+
+if (WIN32 OR APPLE)
+  set(JPEGXL_MATH_LIBRARY "")
+endif()
+
+# Fix pkg-config file on MSVC when building static libraries.
+if (MSVC AND NOT BUILD_SHARED_LIBS)
+  set(JPEGXL_LIBRARY_MAIN jxl-static)
+endif()
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/jxl/libjxl.pc.in"
                "libjxl.pc" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libjxl.pc"
