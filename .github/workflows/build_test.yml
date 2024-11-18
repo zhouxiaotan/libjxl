@@ -330,7 +330,7 @@ jobs:
 
     - name: Coverage upload to Codecov
       if: env.WILL_COV == 'true'
-      uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
+      uses: codecov/codecov-action@5c47607acb93fed5485fdbf7232e8a31425f672a # v5.0.2
       with:
         flags: unittests
         files: build/coverage.xml
